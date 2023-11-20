@@ -22,7 +22,19 @@ fn host_server(ip_and_port: String) {
 }
 fn handle_connection(mut stream: TcpStream) {
     let buf_reader = BufReader::new(&mut stream);
-    let request = buf_reader.lines().next().unwrap().unwrap();
+    let request = match buf_reader.lines().next() {
+        Some(value) => match value {
+            Ok(request) => request,
+            Err(_) => {
+                println!("Error: Encountered problem while reading request");
+                return;
+            },
+        },
+        None => {
+            println!("Error: No request supplied");
+            return;
+        },
+    };
 
     if request == "GET / HTTP/1.1" {
         send_text("src\\assets\\index.html", &mut stream)
