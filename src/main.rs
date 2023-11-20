@@ -3,7 +3,7 @@ use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
 mod threadpool;
 fn main() {
-    let ip_and_port = "192.168.1.93:7878".to_string();
+    let ip_and_port = "0.0.0.0:80".to_string();
     host_server(ip_and_port);
     loop {}
 }
@@ -22,31 +22,41 @@ fn host_server(ip_and_port: String) {
 }
 fn handle_connection(mut stream: TcpStream) {
     let buf_reader = BufReader::new(&mut stream);
-    let request_line = buf_reader.lines().next().unwrap().unwrap();
+    let request = buf_reader.lines().next().unwrap().unwrap();
 
-    if request_line == "GET / HTTP/1.1" {
-        let status_line = "HTTP/1.1 200 OK";
-        let contents = fs::read_to_string("src/html_files/index.html").unwrap();
-        let length = contents.len();
-
-        let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
-
-        let _ = stream.write_all(response.as_bytes());
-    } else if request_line == "GET /ip HTTP/1.1" {
-        let status_line = "HTTP/1.1 200 OK";
-        let contents = format![
-            "<!DOCTYPE html>
-        <head>
-            <title>IP display</title>
-        </head>
-        <body>
-            <h1>Hey, your ip is: \"{}\"</h1>
-            <p>This is a website written in rust.</p>
-        </body>", stream.peer_addr().expect("Failed, sorry")];
-        let length = contents.len();
-
-        let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
-
-        let _ = stream.write_all(response.as_bytes());
+    if request == "GET / HTTP/1.1" {
+        send_text("src\\assets\\index.html", &mut stream)
+    } else if request == "GET /favicon.ico HTTP/1.1" {
+        send_img("src\\assets\\favicon.ico", &mut stream)
     }
+}
+
+
+fn send_text(path: &str, stream: &mut TcpStream) {
+    let status_line = "HTTP/1.1 200 OK";
+    let contents = match fs::read_to_string(path) {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Error: Failed to read/find requested file");
+            return;
+        },
+    };
+    let length = contents.len();
+    let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
+    let _ = stream.write_all(response.as_bytes());
+}
+fn send_img(path: &str, stream: &mut TcpStream) {
+    let status_line = "HTTP/1.1 200 OK";
+    let contents = match fs::read(path) {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Error: Failed to read/find requested file");
+            return;
+        },
+    };
+    let length = contents.len();
+
+    let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n");
+    let _ = stream.write_all(response.as_bytes());
+    let _ = stream.write_all(&contents);
 }
