@@ -1,3 +1,4 @@
+use core::panic;
 use std::thread;
 use std::sync::{mpsc, Arc, Mutex};
 
@@ -49,8 +50,19 @@ struct Worker {
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
-            let job = receiver.lock().unwrap().recv().unwrap(); 
-            
+            let job;
+            let lock = receiver.lock();
+            match lock {
+                Ok(mutex_guard) => {
+                    match mutex_guard.recv() {
+                        Ok(ok_job) => job = ok_job,
+                        Err(_) => panic!("Error: Worker failed to read job."),
+                    }
+                },
+                Err(_) => {
+                    panic!("Error: Worker failed to lock mutex guard.")
+                },
+            }            
             job();
         });
         Worker { id, thread }
