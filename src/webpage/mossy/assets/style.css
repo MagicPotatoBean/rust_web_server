@@ -1,0 +1,170 @@
+p {
+    font-family: Linux Libertine;
+    font-size: 12px ;
+  }
+  
+  p2,p3,p4,p5{
+    font-family: Linux Libertine;
+    font-size: 18px ;
+  }
+  
+  h1 {
+    font-family: Linux Libertine;
+    font-size: 32px ;
+  }
+  
+  h2{
+    font-family: Linux Libertine;
+    font-size: 24px ;
+  }
+  
+  img{
+    float: right;
+  }
+  
+  
+  .box{
+    position: absolute;
+    float: right;
+    width: 200px;
+    height: 400px;
+    background-color: white;
+    border: 2px solid black;
+    z-index:0;
+    margin-top: 20px;
+    margin-left: 680px;
+  }
+  .box2{
+    position: absolute;
+    margin-top: 25px;
+    margin-left: 687px;
+    width: 190px;
+    height: 20px;
+    background-color: #3a88fe;
+    color:white;
+    text-align:center;
+    z-index:1;
+    
+  }
+  .mos_img{
+    position:absolute;
+    margin-top: 55px;
+    margin-left: 705px;
+    z-index: 2;
+  }
+  
+  .parag{
+    position: abolute;
+    width:660px;
+    margin-top: 90px;
+    
+  }
+  
+  .p_info{
+    position: absolute;
+    margin-top: 265px;
+    margin-left: 687px;
+    width: 190px;
+    height: 20px;
+    background-color: #3a88fe;
+    color:white;
+    text-align:center;
+    z-index:1;
+  
+  }
+  .b_info{
+    position: absolute;
+    margin-top: 290px;
+    margin-left: 697px;
+    width: 190px;
+    z-index:4;
+    color:black;
+  }
+  
+  .parag1{
+    
+    position: absolute;
+  
+    width:900px;
+    
+  }
+  
+  .parag2{
+  
+    position: absolute;
+    margin-top:50px;
+  
+  }
+  
+  .line{
+    position:absolute;
+    width: 950px;
+    height: 1px;
+    background-color: black;
+    margin-top: 70px;
+  }
+  
+  .line2{
+    position:absolute;
+    width: 950px;
+    height: 1px;
+    background-color: black;
+    margin-top: 80px;
+  }
+  .line3{
+    position:absolute;
+    width: 950px;
+    height: 1px;
+    background-color: black;
+    margin-top: 250px;
+  }
+  .line4{
+    position:absolute;
+    width: 950px;
+    height: 1px;
+    background-color: black;
+    margin-top: 440px;
+  }
+  
+  .header1{
+    position: absolute;
+    margin-top: 20px;
+  
+    
+  }
+  .header2{
+    position: absolute;
+    margin-top: 180px;
+  
+  
+  }
+  .header3{
+    position: absolute;
+    margin-top: 370px;
+  
+  
+  }
+  
+  
+  .parag4{
+    position: absolute;
+    margin-top: 100px ;
+    z-index: 6;
+    width: 900px;
+    
+  }
+  
+  .parag5{
+    position: absolute;
+    margin-top: 270px;
+    width:900px;
+    
+  }
+  
+  .parag6{
+    position: absolute;
+    margin-top: 450px;
+  
+  
+    
+  }
