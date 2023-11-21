@@ -1,7 +1,7 @@
 use core::panic;
 use std::thread;
 use std::sync::{mpsc, Arc, Mutex};
-
+#[allow(dead_code)]
 pub struct ThreadPool {
     workers: Vec<Worker>,
     sender: mpsc::Sender<Job>,
@@ -41,7 +41,7 @@ impl ThreadPool {
         let _ = self.sender.send(job);
     }
 }
-
+#[allow(dead_code)]
 struct Worker {
     id: usize,
     thread: thread::JoinHandle<()>,
