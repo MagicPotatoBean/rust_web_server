@@ -35,11 +35,11 @@ fn handle_connection(mut stream: TcpStream) {
             return;
         },
     };
-
+    println!("{}", request);
     if request == "GET / HTTP/1.1" {
-        send_text("src\\assets\\index.html", &mut stream)
+        send_text("src\\webpage\\index.html", &mut stream)
     } else if request == "GET /favicon.ico HTTP/1.1" {
-        send_img("src\\assets\\favicon.ico", &mut stream)
+        send_img("src\\webpage\\assets\\favicon.ico", &mut stream)
     }
 }
 
