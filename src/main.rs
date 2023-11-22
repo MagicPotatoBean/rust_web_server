@@ -7,7 +7,7 @@ mod threadpool;
 fn main() {
     let port = "80".to_string();
     host_server(port);
-    loop {}
+
 }
 fn host_server(port: String) {
     let listener = TcpListener::bind(format!["0.0.0.0:{}", port]).unwrap();

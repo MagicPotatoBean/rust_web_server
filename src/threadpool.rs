@@ -1,10 +1,9 @@
-use core::panic;
 use std::thread;
 use std::sync::{mpsc, Arc, Mutex};
 #[allow(dead_code)]
 pub struct ThreadPool {
     workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
+    sender: Option<mpsc::Sender<Job>>,
 }
 
 type Job = Box<dyn FnOnce() + Send + 'static>;
@@ -30,7 +29,10 @@ impl ThreadPool {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
         }
 
-        ThreadPool { workers, sender }
+        ThreadPool {
+            workers,
+            sender: Some(sender),
+        }
     }
     pub fn execute<F>(&self, f: F)
     where
@@ -38,33 +40,48 @@ impl ThreadPool {
     {
         let job = Box::new(f);
 
-        let _ = self.sender.send(job);
+        self.sender.as_ref().unwrap().send(job).unwrap();
     }
 }
+
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        drop(self.sender.take());
+
+        for worker in &mut self.workers {
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
 #[allow(dead_code)]
 struct Worker {
     id: usize,
-    thread: thread::JoinHandle<()>,
+    thread: Option<thread::JoinHandle<()>>,
 }
 
 impl Worker {
     fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
         let thread = thread::spawn(move || loop {
-            let job;
-            let lock = receiver.lock();
-            match lock {
-                Ok(mutex_guard) => {
-                    match mutex_guard.recv() {
-                        Ok(ok_job) => job = ok_job,
-                        Err(_) => panic!("Error: Worker failed to read job."),
-                    }
-                },
+            let message = receiver.lock().unwrap().recv();
+
+            match message {
+                Ok(job) => {
+
+                    job();
+                }
                 Err(_) => {
-                    panic!("Error: Worker failed to lock mutex guard.")
-                },
-            }            
-            job();
+                    break;
+                }
+            }
         });
-        Worker { id, thread }
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
     }
 }
