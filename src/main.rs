@@ -42,7 +42,7 @@ fn send_text(path: &str, stream: &mut TcpStream) {
     let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     let _ = stream.write_all(response.as_bytes());
 }
-fn send_img(path: &str, stream: &mut TcpStream) {
+fn send_data(path: &str, stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 200 OK";
     let contents = match fs::read(path) {
         Ok(value) => value,
@@ -84,7 +84,9 @@ fn handle_connection(mut stream: TcpStream) {
     if        header == "GET / HTTP/1.1" {
         send_text("src\\webpage\\main\\index.html", &mut stream)
     } else if header == "GET /favicon.ico HTTP/1.1" {
-        send_img("src\\webpage\\main\\assets\\favicon.ico", &mut stream)
+        send_data("src\\webpage\\main\\assets\\favicon.ico", &mut stream)
+    } else if header == "GET /file.txt HTTP/1.1" {
+        send_data("src\\webpage\\main\\assets\\test.txt", &mut stream)
     } else {
         print_time(format!("{}: Unknown request from {}: \"{}\", data: \n\"{:#?}\"", "Warn".yellow(), ip, header, body));
         send_text("src\\webpage\\404.html", &mut stream)
