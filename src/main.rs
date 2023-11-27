@@ -7,7 +7,9 @@ mod threadpool;
 fn main() {
     let port = "80".to_string();
     host_server(port);
+    loop {
 
+    }
 }
 fn host_server(port: String) {
     let listener = TcpListener::bind(format!["0.0.0.0:{}", port]).unwrap();
@@ -25,8 +27,8 @@ fn host_server(port: String) {
 }
 fn print_time(text: String) {
     let since_the_epoch = Local::now()
-    .format("%Y-%m-%d][%H:%M:%S");
-println!("[{}]: {}", since_the_epoch, text);
+    .format("[%Y-%m-%d][%H:%M:%S]");
+println!("{}: {}", since_the_epoch, text);
 }
 fn send_text(path: &str, stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 200 OK";
@@ -82,9 +84,11 @@ fn handle_connection(mut stream: TcpStream) {
 
     print_time(format!("Info: Serving {} request \"{}\"", ip, header));
     if        header == "GET / HTTP/1.1" {
-        send_text("src\\webpage\\main\\index.html", &mut stream)
+        send_text("src\\webpage\\index.html", &mut stream)
     } else if header == "GET /favicon.ico HTTP/1.1" {
-        send_img("src\\webpage\\main\\assets\\favicon.ico", &mut stream)
+        send_img("src\\webpage\\assets\\favicon.ico", &mut stream)
+    } else  if header == "GET /records HTTP/1.1" {
+        send_text("src\\webpage\\records\\records.htm", &mut stream)
     } else {
         print_time(format!("{}: Unknown request from {}: \"{}\", data: \n\"{:#?}\"", "Warn".yellow(), ip, header, body));
         send_text("src\\webpage\\404.html", &mut stream)
