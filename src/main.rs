@@ -86,7 +86,7 @@ fn handle_connection(mut stream: TcpStream) {
     if        header == "GET / HTTP/1.1" {
         send_text("src\\webpage\\index.html", &mut stream)
     } else if header == "GET /favicon.ico HTTP/1.1" {
-        send_img("src\\webpage\\assets\\favicon.ico", &mut stream)
+        send_data("src\\webpage\\assets\\favicon.ico", &mut stream)
     } else  if header == "GET /records HTTP/1.1" {
         send_text("src\\webpage\\records\\records.htm", &mut stream)
     } else {
