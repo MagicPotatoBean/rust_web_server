@@ -44,7 +44,7 @@ fn send_text(path: &str, stream: &mut TcpStream) {
     let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     let _ = stream.write_all(response.as_bytes());
 }
-fn send_img(path: &str, stream: &mut TcpStream) {
+fn send_data(path: &str, stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 200 OK";
     let contents = match fs::read(path) {
         Ok(value) => value,
