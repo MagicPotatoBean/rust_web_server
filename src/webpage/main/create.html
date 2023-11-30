@@ -35,12 +35,27 @@
     </style>
 </head>
 <body>
-    <h1>S3 manager</h1>
-    <p>Manage your S3 buckets using the following commands:</p>
-    <ul>
-      <li>
-        <a href="./create">Create a bucket</a>
-      </li>
-      <li><a href="./delete">Delete a bucket</a></li>
-    </ul>
+    <h1><a href="./">Return</a><h1>
+        <h2>Create a bucket</h2>
+        <form method="get" action="create">
+            <table>
+                <tr>
+                    <td>Bucket name</td>
+                    <td>
+                        <input name="name" id="name" type="text">
+                    </td>
+                </tr>
+                <tr>
+                    <td>Region</td>
+                    <td>
+                        <input name="region" id="region" type="text">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="submit" value="Create">
+                    </td>
+                </tr>
+            </table>
+        </form>
 </body>
