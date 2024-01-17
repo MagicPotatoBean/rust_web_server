@@ -1,5 +1,6 @@
 use chrono::Local;
 use colored::Colorize;
+use std::collections::HashMap;
 use std::fs;
 use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
@@ -18,7 +19,7 @@ fn host_server(port: String) {
                 threadpool.execute(|| handle_connection(stream));
             }
             Err(_) => {
-                print_time(format!("Warn: Failed to connect."));
+                print_time(format!("{}: Failed to connect.", "Warn".yellow()));
             }
         };
     }
@@ -28,26 +29,12 @@ fn print_time(text: String) {
     .format("%Y-%m-%d][%H:%M:%S");
 println!("[{}]: {}", since_the_epoch, text);
 }
-fn send_text(path: &str, stream: &mut TcpStream) {
-    let status_line = "HTTP/1.1 200 OK";
-    let contents = match fs::read_to_string(path) {
-        Ok(value) => value,
-        Err(_) => {
-            print_time(format!("Error: Failed to read/find requested file"));
-            
-            return;
-        },
-    };
-    let length = contents.len();
-    let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
-    let _ = stream.write_all(response.as_bytes());
-}
 fn send_data(path: &str, stream: &mut TcpStream) {
     let status_line = "HTTP/1.1 200 OK";
     let contents = match fs::read(path) {
         Ok(value) => value,
         Err(_) => {
-            print_time(format!("Error: Failed to read/find requested file"));
+            print_time(format!("{}: Failed to read/find requested file", "Error".red()));
             return;
         },
     };
@@ -78,17 +65,24 @@ fn handle_connection(mut stream: TcpStream) {
     let body: Vec<_> = request_lines.map(|result| result.unwrap())
     .take_while(|line| !line.is_empty())
     .collect();
+    let mut header_iter = header.split_whitespace();
+    let mut get_redirects: HashMap<&str, &str> = HashMap::new();
 
 
-    print_time(format!("Info: Serving {} request \"{}\"", ip, header));
-    if        header == "GET / HTTP/1.1" {
-        send_text("src\\webpage\\main\\index.html", &mut stream)
-    } else if header == "GET /favicon.ico HTTP/1.1" {
-        send_data("src\\webpage\\main\\assets\\favicon.ico", &mut stream)
-    } else if header == "GET /file.txt HTTP/1.1" {
-        send_data("src\\webpage\\main\\assets\\test.txt", &mut stream)
+    get_redirects.insert("/", "src\\webpage\\main\\index.html");
+    get_redirects.insert("/favicon.ico", "src\\webpage\\main\\assets\\favicon.ico");
+
+
+    if let (Some(method), Some(path), Some(protocol)) = (header_iter.next(),header_iter.next(),header_iter.next()) {
+        if method == "GET" {
+            print_time(format!("Info: Serving {} request \"{}\"", ip, header));
+            if let Some(path) = get_redirects.get(path) {
+                send_data(path, &mut stream);
+            } else {
+                send_data("src\\webpage\\404.html", &mut stream);
+            }
+        }
     } else {
-        print_time(format!("{}: Unknown request from {}: \"{}\", data: \n\"{:#?}\"", "Warn".yellow(), ip, header, body));
-        send_text("src\\webpage\\404.html", &mut stream)
+        print_time(format!("Info: Client {} requested a nonsense header \"{}\"", ip, header));
     }
 }
