@@ -71,6 +71,7 @@ fn handle_connection(mut stream: TcpStream) {
 
     get_redirects.insert("/", "src\\webpage\\main\\index.html");
     get_redirects.insert("/favicon.ico", "src\\webpage\\main\\assets\\favicon.ico");
+    get_redirects.insert("/catch_project/writeup", "C:\\Users\\terra\\source\\repos\\VSCode\\Rust\\web_server\\src\\webpage\\catch_project\\writeup.html");
 
 
     if let (Some(method), Some(path), Some(protocol)) = (header_iter.next(),header_iter.next(),header_iter.next()) {
